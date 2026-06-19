@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="交易守门员" />
+  <title>交易守门员</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <style>
+    :root{
+      --bg:#070b16; --panel:#0e1528; --panel2:#131d35; --text:#eef3ff;
+      --muted:#9aa8c7; --line:#25304b; --accent:#6ea8fe; --good:#37d67a;
+      --warn:#ffbd4a; --bad:#ff647c; --shadow:0 18px 60px rgba(0,0,0,.32);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; min-height:100vh; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+      "PingFang SC","Microsoft YaHei",Arial,sans-serif;
+      color:var(--text); background:
+      radial-gradient(circle at 15% 0%,rgba(69,105,255,.16),transparent 32%),
+      radial-gradient(circle at 100% 20%,rgba(55,214,122,.08),transparent 28%),var(--bg);
+    }
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:760px;margin:0 auto;padding:20px 16px 96px}
+    .hero{
+      padding:28px 22px; border:1px solid rgba(255,255,255,.08); border-radius:28px;
+      background:linear-gradient(145deg,rgba(20,31,58,.95),rgba(10,15,30,.95)); box-shadow:var(--shadow)
+    }
+    .badge{display:inline-flex;gap:8px;align-items:center;padding:7px 11px;border-radius:999px;
+      font-size:13px;color:#c9d7ff;background:rgba(110,168,254,.12);border:1px solid rgba(110,168,254,.22)}
+    h1{font-size:34px;margin:14px 0 8px;letter-spacing:-.5px}
+    .subtitle{color:var(--muted);line-height:1.75;margin:0}
+    .formula{margin-top:18px;padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.07);font-weight:700;text-align:center}
+    .formula span{color:var(--warn)}
+    .nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+    .nav button{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:12px 8px;border-radius:14px}
+    .nav button.active{background:var(--accent);color:#07101f;border-color:transparent;font-weight:800}
+    .screen{display:none}.screen.active{display:block}
+    .card{margin-top:14px;padding:20px;border:1px solid rgba(255,255,255,.075);border-radius:var(--radius);
+      background:rgba(14,21,40,.94);box-shadow:0 12px 40px rgba(0,0,0,.2)}
+    .card h2{margin:0 0 8px;font-size:20px}.card h3{margin:20px 0 10px;font-size:16px}
+    .muted{color:var(--muted);line-height:1.7;font-size:14px}
+    .quote{padding:17px;border-left:4px solid var(--accent);background:rgba(110,168,254,.08);
+      border-radius:0 14px 14px 0;line-height:1.8;font-weight:650}
+    .danger-quote{border-left-color:var(--bad);background:rgba(255,100,124,.08)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .field{margin-top:13px}.field label{display:block;margin-bottom:7px;color:#dce5ff;font-size:14px;font-weight:650}
+    input,select,textarea{
+      width:100%;border:1px solid var(--line);border-radius:13px;background:#0a1122;color:var(--text);
+      padding:13px 14px;outline:none;transition:.2s
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(110,168,254,.12)}
+    textarea{min-height:92px;resize:vertical;line-height:1.6}
+    .check{display:flex;gap:11px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.055)}
+    .check:last-child{border-bottom:0}
+    .check input{width:21px;height:21px;min-width:21px;margin-top:1px;accent-color:var(--accent)}
+    .check span{line-height:1.6}.check small{display:block;color:var(--muted);margin-top:2px}
+    .metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    .metric{padding:13px;border-radius:15px;background:var(--panel2);border:1px solid var(--line)}
+    .metric b{font-size:20px;display:block;margin-top:5px}.metric small{color:var(--muted)}
+    .risk-low{color:var(--good)}.risk-mid{color:var(--warn)}.risk-high{color:var(--bad)}
+    .btn{
+      width:100%;border:0;border-radius:15px;padding:15px 18px;font-weight:800;margin-top:14px;
+      background:var(--accent);color:#07101f
+    }
+    .btn.secondary{background:#18233e;color:var(--text);border:1px solid var(--line)}
+    .btn.danger{background:var(--bad);color:white}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    .result{display:none;margin-top:16px;padding:18px;border-radius:18px}
+    .result.show{display:block}
+    .result.good{background:rgba(55,214,122,.1);border:1px solid rgba(55,214,122,.35)}
+    .result.warn{background:rgba(255,189,74,.1);border:1px solid rgba(255,189,74,.35)}
+    .result.bad{background:rgba(255,100,124,.1);border:1px solid rgba(255,100,124,.35)}
+    .result h3{margin:0 0 8px;font-size:22px}
+    .result ul{padding-left:20px;line-height:1.7}
+    .cooldown{display:none;text-align:center;margin-top:14px;padding:18px;border-radius:18px;background:#0a1122;border:1px solid var(--line)}
+    .cooldown.show{display:block}.timer{font-size:42px;font-weight:900;letter-spacing:2px;color:var(--warn)}
+    .code{font-size:30px;font-weight:900;letter-spacing:5px;color:var(--good);margin:10px 0}
+    .journal-item{padding:14px 0;border-bottom:1px solid var(--line)}
+    .journal-item:last-child{border-bottom:0}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800}
+    .pill.good{background:rgba(55,214,122,.14);color:var(--good)}
+    .pill.bad{background:rgba(255,100,124,.14);color:var(--bad)}
+    .pill.warn{background:rgba(255,189,74,.14);color:var(--warn)}
+    .footer-note{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.65;text-align:center}
+    .install{display:none}
+    .notice{padding:12px 14px;border-radius:14px;background:rgba(255,189,74,.08);border:1px solid rgba(255,189,74,.25);color:#ffe4aa;font-size:14px;line-height:1.6}
+    @media(max-width:560px){
+      h1{font-size:30px}.grid2{grid-template-columns:1fr}.metric-row{grid-template-columns:1fr 1fr}
+      .metric-row .metric:last-child{grid-column:1/-1}.app{padding-left:12px;padding-right:12px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <div class="badge">🛡️ 交易守门员 · 本地离线版</div>
+    <h1>先过这一关，再开仓</h1>
+    <p class="subtitle">它不能替你判断涨跌，但可以在你着急、执着、害怕踏空或想翻本时，拦住最危险的那一下。</p>
+    <div class="formula">真实风险 = 资金杠杆 × <span>心理杠杆</span> × 执行失控</div>
+  </section>
+
+  <div class="nav">
+    <button class="active" data-tab="check">交易前检查</button>
+    <button data-tab="rules">我的底线</button>
+    <button data-tab="journal">本地日志</button>
+  </div>
+
+  <section id="check" class="screen active">
+    <div class="card">
+      <h2>第一关：现在的我，适合交易吗？</h2>
+      <p class="muted">请诚实勾选。勾选不是承认软弱，而是提前阻止情绪接管账户。</p>
+      <div id="emotionChecks">
+        <label class="check"><input type="checkbox" data-weight="18"><span>我现在很着急，想尽快下单。<small>着急会缩短观察时间，放大“马上错过”的错觉。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="20"><span>我害怕它马上上涨，担心踏空。<small>错过不是亏损，追进去才可能变成真实亏损。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="25" data-critical="1"><span>我刚止损、割肉或错过行情，想马上赚回来。<small>这是报复性交易的典型入口。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="20" data-critical="1"><span>我正被债务、家庭、收入或现实压力推动。<small>市场不会因为你需要钱，就降低波动。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="25" data-critical="1"><span>我觉得这一单可能让我翻身、证明自己。<small>一笔普通交易被赋予命运任务后，心理杠杆会失控。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="15"><span>我睡眠不足、熬夜，或已经连续看盘很久。<small>疲劳会降低克制力和止损执行力。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="15"><span>我在反复刷新价格，心跳加快或坐立不安。<small>身体已经在提示：你不是平静状态。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="20"><span>我是因为群聊、博主、热搜或突然拉升才想买。<small>这通常是别人情绪的尾端，不是你的计划起点。</small></span></label>
+        <label class="check"><input type="checkbox" data-weight="12"><span>我已经开始幻想这笔交易能赚多少钱。<small>先算会亏多少，再想可能赚多少。</small></span></label>
+      </div>
+      <div class="metric-row">
+        <div class="metric"><small>心理杠杆评分</small><b id="psychScore" class="risk-low">0 / 100</b></div>
+        <div class="metric"><small>当前状态</small><b id="psychLabel" class="risk-low">冷静</b></div>
+        <div class="metric"><small>强制动作</small><b id="psychAction" class="risk-low">可继续检查</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>第二关：把交易写清楚</h2>
+      <div class="grid2">
+        <div class="field"><label>交易品种</label><input id="symbol" placeholder="例如 BTCUSDT"></div>
+        <div class="field"><label>品种类别</label>
+          <select id="category">
+            <option value="btc">比特币合约</option>
+            <option value="alt">山寨币合约</option>
+            <option value="spot">现货 / 无杠杆</option>
+          </select>
+        </div>
+        <div class="field"><label>方向</label><select id="side"><option>做多</option><option>做空</option></select></div>
+        <div class="field"><label>杠杆倍数</label><input id="leverage" type="number" min="1" step="1" value="1"></div>
+        <div class="field"><label>账户权益（USDT）</label><input id="equity" type="number" min="0" step="0.01" placeholder="例如 3000"></div>
+        <div class="field"><label>计划投入保证金（USDT）</label><input id="margin" type="number" min="0" step="0.01" placeholder="例如 100"></div>
+        <div class="field"><label>计划入场价</label><input id="entry" type="number" min="0" step="any" placeholder="例如 65000"></div>
+        <div class="field"><label>止损价</label><input id="stop" type="number" min="0" step="any" placeholder="必须填写"></div>
+        <div class="field"><label>第一目标价</label><input id="target" type="number" min="0" step="any" placeholder="例如 68000"></div>
+        <div class="field"><label>最长计划持仓</label><input id="holdTime" placeholder="例如 24小时 / 3天"></div>
+      </div>
+
+      <div class="field"><label>我的开仓逻辑</label><textarea id="reason" placeholder="必须写出结构、趋势、价格位置、事件或周期依据。不能只写“感觉会涨”。"></textarea></div>
+      <div class="field"><label>什么情况说明我错了？</label><textarea id="invalid" placeholder="写出明确失效条件。例如：4小时级别收盘跌破某位置，而不是“再看看”。"></textarea></div>
+
+      <div class="metric-row">
+        <div class="metric"><small>名义仓位</small><b id="notional">0</b></div>
+        <div class="metric"><small>预计止损金额</small><b id="lossAmount">0</b></div>
+        <div class="metric"><small>单笔账户风险</small><b id="riskPct" class="risk-low">0%</b></div>
+      </div>
+      <p class="muted">计算方式：保证金 × 杠杆 = 名义仓位；价格到止损时的仓位损失 ÷ 账户权益 = 单笔风险。未计手续费和滑点。</p>
+    </div>
+
+    <div class="card">
+      <h2>第三关：执行承诺</h2>
+      <div id="promiseChecks">
+        <label class="check"><input type="checkbox"><span>我已经设置止损，并接受止损触发后立即离场。</span></label>
+        <label class="check"><input type="checkbox"><span>这笔交易亏损后，我不会立即反向开仓或报复性交易。</span></label>
+        <label class="check"><input type="checkbox"><span>我不会临时扩大止损，也不会用补仓掩盖错误。</span></label>
+        <label class="check"><input type="checkbox"><span>我接受错过、少赚、判断错误和空仓。</span></label>
+        <label class="check"><input type="checkbox"><span>我确认这一单不负责翻身、还债或证明自己。</span></label>
+      </div>
+
+      <button class="btn" id="evaluateBtn">生成交易许可判断</button>
+      <div id="result" class="result"></div>
+
+      <div id="cooldown" class="cooldown">
+        <div class="muted">情绪风险已触发，请离开交易软件并冷静</div>
+        <div id="timer" class="timer">10:00</div>
+        <div class="muted">倒计时结束后，重新检查情绪。不要只是等时间过去。</div>
+        <button class="btn secondary" id="cancelTimer">取消倒计时</button>
+      </div>
+    </div>
+
+    <div class="footer-note">本工具只做纪律与风险检查，不提供买卖建议。所有数据仅保存在当前设备浏览器中。</div>
+  </section>
+
+  <section id="rules" class="screen">
+    <div class="card">
+      <h2>我的交易底线</h2>
+      <div class="quote">我今天最重要的目标，不是赚钱，而是保持清醒、执行计划、保住下一次出手的资格。</div>
+      <h3>杠杆上限</h3>
+      <p class="muted">比特币合约最高不超过 <b style="color:var(--text)">10倍</b>；山寨币合约最高不超过 <b style="color:var(--text)">3倍</b>。这是上限，不是每次都必须用满。</p>
+      <h3>单笔风险</h3>
+      <p class="muted">原则上不超过账户权益的 <b style="color:var(--text)">1%</b>。越不确定、越疲劳、越焦虑，仓位越小；情绪失控时直接空仓。</p>
+      <h3>连续亏损保护</h3>
+      <p class="muted">连续止损两笔、当天亏损达到2%、一周亏损达到5%，或者出现一次移动止损、情绪补仓、报复性交易，立即停止交易。</p>
+      <div class="quote danger-quote">执着于逻辑，可以；执着于仓位，不可以。投入的时间、情绪和亏损，不能成为继续扛单的理由。</div>
+      <h3>写给着急的自己</h3>
+      <p class="muted">越想快速翻身，越容易把普通交易变成命运赌局。真正能让我走出来的，不是一笔暴利，而是停止犯致命错误，控制回撤，让自己长期留在牌桌上。</p>
+      <h3>最终问题</h3>
+      <div class="quote">如果这笔交易止损，我能不能平静接受？如果不能——不要开仓。</div>
+    </div>
+  </section>
+
+  <section id="journal" class="screen">
+    <div class="card">
+      <h2>本地交易日志</h2>
+      <p class="muted">每次生成判断都会保存在当前设备。你可以定期回看：亏损往往来自方向判断，还是情绪和纪律。</p>
+      <div id="journalList"></div>
+      <button class="btn secondary" id="exportBtn">导出日志 CSV</button>
+      <button class="btn danger" id="clearBtn">清空本地日志</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const tabs = document.querySelectorAll('.nav button');
+  const screens = document.querySelectorAll('.screen');
+  tabs.forEach(btn => btn.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    screens.forEach(x => x.classList.remove('active'));
+    btn.classList.add('active');
+    $(btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'journal') renderJournal();
+  }));
+
+  const emotionInputs = [...document.querySelectorAll('#emotionChecks input')];
+  const promiseInputs = [...document.querySelectorAll('#promiseChecks input')];
+  const fields = ['category','leverage','equity','margin','entry','stop'].map($);
+
+  function psychState(){
+    let score = 0, count = 0, critical = 0;
+    emotionInputs.forEach(i => {
+      if(i.checked){ score += Number(i.dataset.weight || 0); count++; if(i.dataset.critical) critical++; }
+    });
+    score = Math.min(100, score);
+    let label='冷静', cls='risk-low', action='可继续检查';
+    if(score >= 40 || critical > 0){ label='高风险'; cls='risk-high'; action='禁止立即开仓'; }
+    else if(score > 0){ label='不稳定'; cls='risk-mid'; action='冷静10分钟'; }
+    $('psychScore').textContent = `${score} / 100`;
+    $('psychLabel').textContent = label;
+    $('psychAction').textContent = action;
+    ['psychScore','psychLabel','psychAction'].forEach(id => {
+      $(id).className = cls;
+    });
+    return {score,count,critical,label};
+  }
+
+  function calcRisk(){
+    const lev = Math.max(0, Number($('leverage').value || 0));
+    const equity = Math.max(0, Number($('equity').value || 0));
+    const margin = Math.max(0, Number($('margin').value || 0));
+    const entry = Math.max(0, Number($('entry').value || 0));
+    const stop = Math.max(0, Number($('stop').value || 0));
+    const notional = margin * lev;
+    const move = entry > 0 && stop > 0 ? Math.abs(entry-stop)/entry : 0;
+    const loss = notional * move;
+    const pct = equity > 0 ? loss/equity*100 : 0;
+    $('notional').textContent = `${notional.toFixed(2)} USDT`;
+    $('lossAmount').textContent = `${loss.toFixed(2)} USDT`;
+    $('riskPct').textContent = `${pct.toFixed(2)}%`;
+    $('riskPct').className = pct <= 1 ? 'risk-low' : pct <= 2 ? 'risk-mid' : 'risk-high';
+    return {lev,equity,margin,entry,stop,notional,loss,pct};
+  }
+
+  emotionInputs.forEach(i => i.addEventListener('change', psychState));
+  fields.forEach(i => i.addEventListener('input', calcRisk));
+  $('category').addEventListener('change', () => {
+    if($('category').value === 'spot') $('leverage').value = 1;
+    calcRisk();
+  });
+
+  let timerId = null, remaining = 600;
+  function startCooldown(){
+    clearInterval(timerId);
+    remaining = 600;
+    $('cooldown').classList.add('show');
+    updateTimer();
+    timerId = setInterval(() => {
+      remaining--;
+      updateTimer();
+      if(remaining <= 0){
+        clearInterval(timerId);
+        $('timer').textContent = '可以重新检查';
+      }
+    },1000);
+    $('cooldown').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function updateTimer(){
+    const m = String(Math.floor(remaining/60)).padStart(2,'0');
+    const s = String(remaining%60).padStart(2,'0');
+    $('timer').textContent = `${m}:${s}`;
+  }
+  $('cancelTimer').addEventListener('click', () => {
+    clearInterval(timerId); $('cooldown').classList.remove('show');
+  });
+
+  function randomCode(){
+    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  }
+
+  function collectData(status, reasons, psych, risk){
+    const data = {
+      time:new Date().toLocaleString('zh-CN',{hour12:false}),
+      status, reasons:reasons.join('；'),
+      symbol:$('symbol').value.trim() || '未填写',
+      category:$('category').options[$('category').selectedIndex].text,
+      side:$('side').value, leverage:risk.lev,
+      equity:risk.equity, margin:risk.margin, entry:risk.entry, stop:risk.stop,
+      target:$('target').value, riskPct:Number(risk.pct.toFixed(2)),
+      psychScore:psych.score, reason:$('reason').value.trim(),
+      invalid:$('invalid').value.trim()
+    };
+    const logs = JSON.parse(localStorage.getItem('tradeGuardLogs') || '[]');
+    logs.unshift(data);
+    localStorage.setItem('tradeGuardLogs',JSON.stringify(logs.slice(0,300)));
+  }
+
+  $('evaluateBtn').addEventListener('click', () => {
+    const psych = psychState();
+    const risk = calcRisk();
+    const reasons = [];
+    const cat = $('category').value;
+    const maxLev = cat === 'btc' ? 10 : cat === 'alt' ? 3 : 1;
+    const symbol = $('symbol').value.trim();
+    const reason = $('reason').value.trim();
+    const invalid = $('invalid').value.trim();
+    const promisesOK = promiseInputs.every(i => i.checked);
+
+    if(!symbol) reasons.push('没有填写交易品种');
+    if(risk.lev <= 0) reasons.push('杠杆倍数无效');
+    if(risk.lev > maxLev) reasons.push(`${cat==='btc'?'比特币':cat==='alt'?'山寨币':'现货'}杠杆超过上限 ${maxLev} 倍`);
+    if(risk.equity <= 0 || risk.margin <= 0 || risk.entry <= 0 || risk.stop <= 0) reasons.push('账户、保证金、入场价或止损价未完整填写');
+    if(risk.entry === risk.stop && risk.entry > 0) reasons.push('止损价不能等于入场价');
+    if(risk.entry > 0 && risk.stop > 0 && $('side').value === '做多' && risk.stop >= risk.entry) reasons.push('做多交易的止损价必须低于入场价');
+    if(risk.entry > 0 && risk.stop > 0 && $('side').value === '做空' && risk.stop <= risk.entry) reasons.push('做空交易的止损价必须高于入场价');
+    if(risk.pct > 1) reasons.push(`单笔风险 ${risk.pct.toFixed(2)}% 超过 1% 上限`);
+    if(reason.length < 15) reasons.push('开仓逻辑过于简短，可能只是感觉');
+    if(invalid.length < 10) reasons.push('失效条件不够明确');
+    if(!promisesOK) reasons.push('执行承诺没有全部确认');
+
+    let status='通过', cls='good', title='✅ 允许按计划执行';
+    if(psych.count > 0){
+      status='冷静期';
+      cls='warn';
+      title='⏸ 现在不允许立即开仓';
+      reasons.unshift('检测到心理杠杆或情绪风险');
+      startCooldown();
+    }
+    if(reasons.some(x => !x.includes('心理杠杆')) && reasons.length > (psych.count > 0 ? 1 : 0)){
+      status='拦截';
+      cls='bad';
+      title='🛑 本次交易不予通过';
+    }
+
+    const result = $('result');
+    result.className = `result show ${cls}`;
+    let html = `<h3>${title}</h3>`;
+    if(status === '通过'){
+      const code = randomCode();
+      html += `<p>所有硬性条件已通过。请只执行你刚刚填写的计划，不临时扩大风险。</p>
+               <div class="code">${code}</div>
+               <p class="muted">这是本次纪律许可码，不代表行情判断正确，也不保证盈利。</p>`;
+    }else{
+      html += `<ul>${reasons.map(r=>`<li>${r}</li>`).join('')}</ul>`;
+      html += `<p><b>先修改违规项或完成冷静期，再重新评估。不要绕过检查直接下单。</b></p>`;
+    }
+    result.innerHTML = html;
+    result.scrollIntoView({behavior:'smooth',block:'center'});
+    collectData(status,reasons,psych,risk);
+  });
+
+  function renderJournal(){
+    const logs = JSON.parse(localStorage.getItem('tradeGuardLogs') || '[]');
+    const box = $('journalList');
+    if(!logs.length){ box.innerHTML='<p class="muted">还没有记录。</p>'; return; }
+    box.innerHTML = logs.map(x => {
+      const cls = x.status==='通过'?'good':x.status==='冷静期'?'warn':'bad';
+      return `<div class="journal-item">
+        <div><span class="pill ${cls}">${x.status}</span> <b>${escapeHtml(x.symbol)}</b> · ${escapeHtml(x.side)} · ${x.leverage}x</div>
+        <div class="muted">${escapeHtml(x.time)} ｜ 风险 ${x.riskPct}% ｜ 心理评分 ${x.psychScore}</div>
+        ${x.reasons?`<div class="muted">原因：${escapeHtml(x.reasons)}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  function escapeHtml(str=''){
+    return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  $('clearBtn').addEventListener('click', () => {
+    if(confirm('确定清空全部本地日志？此操作无法恢复。')){
+      localStorage.removeItem('tradeGuardLogs'); renderJournal();
+    }
+  });
+
+  $('exportBtn').addEventListener('click', () => {
+    const logs = JSON.parse(localStorage.getItem('tradeGuardLogs') || '[]');
+    if(!logs.length){ alert('暂无日志可导出'); return; }
+    const headers=['时间','状态','交易品种','类别','方向','杠杆','账户权益','保证金','入场价','止损价','目标价','风险百分比','心理评分','拦截原因','开仓逻辑','失效条件'];
+    const rows=logs.map(x=>[x.time,x.status,x.symbol,x.category,x.side,x.leverage,x.equity,x.margin,x.entry,x.stop,x.target,x.riskPct,x.psychScore,x.reasons,x.reason,x.invalid]);
+    const csv='\ufeff'+[headers,...rows].map(row=>row.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+    const url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=`交易守门员日志_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+
+  psychState(); calcRisk(); renderJournal();
+  if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+})();
+</script>
+</body>
+</html>
