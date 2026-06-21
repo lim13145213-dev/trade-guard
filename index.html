@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="交易守门员" />
   <title>交易守门员</title>
-  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=4" />
   
     <style>
     :root{
@@ -104,8 +103,8 @@
   <section class="hero">
     <div class="badge">🛡️ 交易守门员 · 本地离线版</div>
     <h1>先过这一关，再开仓</h1>
-    <p class="subtitle">它不能替你判断涨跌，但可以在你着急、执着、害怕踏空或想翻本时，拦住最危险的那一下。</p>
-    <div class="formula">真实风险 = 资金杠杆 × <span>心理杠杆</span> × 执行失控</div>
+    <p class="subtitle">它不能替你判断涨跌，但可以在你着急、执着、害怕踏空或想翻本时，拦住最危险的那一下。慢就是快，安全感来自秩序，而不是来自一次重仓。</p>
+    <div class="formula">我的目标不是刺激，而是<span>安全感、秩序、可复盘</span></div>
   </section>
 
   <div class="nav" style="grid-template-columns:repeat(4,1fr)">
@@ -118,7 +117,7 @@
   <section id="check" class="screen active">
     <div class="card">
       <h2>第一关：现在的我，适合交易吗？</h2>
-      <p class="muted">请诚实勾选。勾选不是承认软弱，而是提前阻止情绪接管账户。</p>
+      <p class="muted">请诚实勾选。勾选不是承认软弱，而是提前阻止情绪接管账户。真正的安全感，不是马上赚钱，而是我知道自己每一步为什么做。</p>
       <div id="emotionChecks">
         <label class="check"><input type="checkbox" data-weight="18"><span>我现在很着急，想尽快下单。<small>着急会缩短观察时间，放大“马上错过”的错觉。</small></span></label>
         <label class="check"><input type="checkbox" data-weight="20"><span>我害怕它马上上涨，担心踏空。<small>错过不是亏损，追进去才可能变成真实亏损。</small></span></label>
@@ -165,12 +164,23 @@
         <div class="metric"><small>名义仓位</small><b id="notional">0</b></div>
         <div class="metric"><small>预计止损金额</small><b id="lossAmount">0</b></div>
         <div class="metric"><small>单笔账户风险</small><b id="riskPct" class="risk-low">0%</b></div>
+        <div class="metric"><small>盈亏比</small><b id="rrRatio" class="risk-low">0 : 1</b></div>
       </div>
-      <p class="muted">计算方式：保证金 × 杠杆 = 名义仓位；价格到止损时的仓位损失 ÷ 账户权益 = 单笔风险。未计手续费和滑点。</p>
+      <p class="muted">计算方式：保证金 × 杠杆 = 名义仓位；价格到止损时的仓位损失 ÷ 账户权益 = 单笔风险。新版会同时计算盈亏比：目标收益 ÷ 止损亏损。未计手续费和滑点。</p>
     </div>
 
     <div class="card">
-      <h2>第三关：执行承诺</h2>
+      <h2>第三关：慢就是快</h2>
+      <div class="quote">我追求的不是一把梭之后的刺激，而是一种稳定的安全感。安全感来自秩序：固定的仓位、明确的止损、合理的盈亏比、能接受的亏损、交易后的复盘。</div>
+      <div id="orderChecks">
+        <label class="check"><input type="checkbox"><span>我接受慢一点。慢不是错过，慢是在等真正属于我的机会。</span></label>
+        <label class="check"><input type="checkbox"><span>我追求的是秩序，不是刺激；是长期活下来，不是今天翻身。</span></label>
+        <label class="check"><input type="checkbox"><span>我允许自己空仓。空仓不是失败，而是在保护下一次出手的资格。</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>第四关：执行承诺</h2>
       <div id="promiseChecks">
         <label class="check"><input type="checkbox"><span>我已经设置止损，并接受止损触发后立即离场。</span></label>
         <label class="check"><input type="checkbox"><span>这笔交易亏损后，我不会立即反向开仓或报复性交易。</span></label>
@@ -183,9 +193,9 @@
       <div id="result" class="result"></div>
 
       <div id="cooldown" class="cooldown">
-        <div class="muted">情绪风险已触发，请离开交易软件并冷静</div>
+        <div class="muted">情绪风险已触发，请离开交易软件。慢就是快，先把秩序拿回来。</div>
         <div id="timer" class="timer">10:00</div>
-        <div class="muted">倒计时结束后，重新检查情绪。不要只是等时间过去。</div>
+        <div class="muted">倒计时结束后，重新检查情绪。不要只是等时间过去，要让自己重新回到安全、清醒、有计划的状态。</div>
         <button class="btn secondary" id="cancelTimer">取消倒计时</button>
       </div>
     </div>
@@ -197,10 +207,13 @@
     <div class="card">
       <h2>我的交易底线</h2>
       <div class="quote">我今天最重要的目标，不是赚钱，而是保持清醒、执行计划、保住下一次出手的资格。</div>
+      <h3>我要的安全感</h3>
+      <p class="muted">我真正追求的不是暴利带来的短暂兴奋，而是可控、稳定、有秩序的安全感。交易里的安全感不是市场给我的，是我用仓位、止损、盈亏比、暂停机制和复盘系统建立出来的。</p>
+      <div class="quote">慢就是快。快，是情绪想立刻得到结果；慢，是理性在保护本金和未来。</div>
       <h3>杠杆上限</h3>
       <p class="muted">比特币合约最高不超过 <b style="color:var(--text)">10倍</b>；山寨币合约最高不超过 <b style="color:var(--text)">3倍</b>。这是上限，不是每次都必须用满。</p>
       <h3>单笔风险</h3>
-      <p class="muted">原则上不超过账户权益的 <b style="color:var(--text)">1%</b>。越不确定、越疲劳、越焦虑，仓位越小；情绪失控时直接空仓。</p>
+      <p class="muted">常规线为账户权益的 <b style="color:var(--text)">1%</b>。如果盈亏比足够好，可以放宽：1%—2% 要求盈亏比 ≥ 2；2%—3% 要求盈亏比 ≥ 3；超过 3% 一律拦截。越不确定、越疲劳、越焦虑，仓位越小；情绪失控时直接空仓。</p>
       <h3>连续亏损保护</h3>
       <p class="muted">连续止损两笔、当天亏损达到2%、一周亏损达到5%，或者出现一次移动止损、情绪补仓、报复性交易，立即停止交易。</p>
       <div class="quote danger-quote">执着于逻辑，可以；执着于仓位，不可以。投入的时间、情绪和亏损，不能成为继续扛单的理由。</div>
@@ -260,7 +273,7 @@
         <div class="metric"><small>纪律违规次数</small><b id="statViolations">0</b></div>
       </div>
       <h3>复盘结论</h3>
-      <div id="statsInsight" class="quote">完成几笔交易并回填结果后，这里会自动生成结论。</div>
+      <div id="statsInsight" class="quote">完成几笔交易并回填结果后，这里会自动生成结论。复盘不是为了责怪自己，而是为了建立安全感和秩序。</div>
     </div>
   </section>
 
@@ -280,8 +293,8 @@
   }));
 
   const emotionInputs = [...document.querySelectorAll('#emotionChecks input')];
-  const promiseInputs = [...document.querySelectorAll('#promiseChecks input')];
-  const fields = ['category','leverage','equity','margin','entry','stop'].map($);
+  const promiseInputs = [...document.querySelectorAll('#promiseChecks input'), ...document.querySelectorAll('#orderChecks input')];
+  const fields = ['category','side','leverage','equity','margin','entry','stop','target'].map($);
 
   function psychState(){
     let score = 0, count = 0, critical = 0;
@@ -307,18 +320,31 @@
     const margin = Math.max(0, Number($('margin').value || 0));
     const entry = Math.max(0, Number($('entry').value || 0));
     const stop = Math.max(0, Number($('stop').value || 0));
+    const target = Math.max(0, Number($('target').value || 0));
+    const side = $('side').value;
     const notional = margin * lev;
-    const move = entry > 0 && stop > 0 ? Math.abs(entry-stop)/entry : 0;
-    const loss = notional * move;
+    const stopMove = entry > 0 && stop > 0 ? Math.abs(entry-stop)/entry : 0;
+    const loss = notional * stopMove;
     const pct = equity > 0 ? loss/equity*100 : 0;
+
+    let targetMove = 0;
+    let rr = 0;
+    if(entry > 0 && target > 0 && stopMove > 0){
+      if(side === '做多' && target > entry) targetMove = (target-entry)/entry;
+      if(side === '做空' && target < entry) targetMove = (entry-target)/entry;
+      rr = targetMove > 0 ? targetMove / stopMove : 0;
+    }
+
     $('notional').textContent = `${notional.toFixed(2)} USDT`;
     $('lossAmount').textContent = `${loss.toFixed(2)} USDT`;
     $('riskPct').textContent = `${pct.toFixed(2)}%`;
     $('riskPct').className = pct <= 1 ? 'risk-low' : pct <= 2 ? 'risk-mid' : 'risk-high';
-    return {lev,equity,margin,entry,stop,notional,loss,pct};
-  }
-
-  emotionInputs.forEach(i => i.addEventListener('change', psychState));
+    if($('rrRatio')){
+      $('rrRatio').textContent = `${rr.toFixed(2)} : 1`;
+      $('rrRatio').className = rr >= 3 ? 'risk-low' : rr >= 2 ? 'risk-mid' : 'risk-high';
+    }
+    return {lev,equity,margin,entry,stop,target,notional,loss,pct,rr};
+  }  emotionInputs.forEach(i => i.addEventListener('change', psychState));
   fields.forEach(i => i.addEventListener('input', calcRisk));
   $('category').addEventListener('change', () => {
     if($('category').value === 'spot') $('leverage').value = 1;
@@ -365,7 +391,7 @@
       side:$('side').value, leverage:risk.lev,
       equity:risk.equity, margin:risk.margin, entry:risk.entry, stop:risk.stop,
       target:$('target').value, holdTime:$('holdTime').value.trim(),
-      riskPct:Number(risk.pct.toFixed(2)),
+      riskPct:Number(risk.pct.toFixed(2)), rr:Number((risk.rr||0).toFixed(2)),
       psychScore:psych.score, reason:$('reason').value.trim(),
       invalid:$('invalid').value.trim(),
       completed:false, outcome:'', pnl:'', discipline:'', review:''
@@ -393,7 +419,15 @@
     if(risk.entry === risk.stop && risk.entry > 0) reasons.push('止损价不能等于入场价');
     if(risk.entry > 0 && risk.stop > 0 && $('side').value === '做多' && risk.stop >= risk.entry) reasons.push('做多交易的止损价必须低于入场价');
     if(risk.entry > 0 && risk.stop > 0 && $('side').value === '做空' && risk.stop <= risk.entry) reasons.push('做空交易的止损价必须高于入场价');
-    if(risk.pct > 1) reasons.push(`单笔风险 ${risk.pct.toFixed(2)}% 超过 1% 上限`);
+    if(risk.entry > 0 && risk.target > 0 && $('side').value === '做多' && risk.target <= risk.entry) reasons.push('做多交易的目标价必须高于入场价');
+    if(risk.entry > 0 && risk.target > 0 && $('side').value === '做空' && risk.target >= risk.entry) reasons.push('做空交易的目标价必须低于入场价');
+    if(risk.pct > 3) {
+      reasons.push(`单笔风险 ${risk.pct.toFixed(2)}% 超过 3% 绝对上限`);
+    } else if(risk.pct > 2 && risk.rr < 3) {
+      reasons.push(`单笔风险 ${risk.pct.toFixed(2)}% 偏高，必须盈亏比 ≥ 3，目前为 ${risk.rr.toFixed(2)} : 1`);
+    } else if(risk.pct > 1 && risk.rr < 2) {
+      reasons.push(`单笔风险 ${risk.pct.toFixed(2)}% 超过常规线，必须盈亏比 ≥ 2，目前为 ${risk.rr.toFixed(2)} : 1`);
+    }
     if(reason.length < 15) reasons.push('开仓逻辑过于简短，可能只是感觉');
     if(invalid.length < 10) reasons.push('失效条件不够明确');
     if(!promisesOK) reasons.push('执行承诺没有全部确认');
@@ -417,12 +451,12 @@
     let html = `<h3>${title}</h3>`;
     if(status === '通过'){
       const code = randomCode();
-      html += `<p>所有硬性条件已通过。请只执行你刚刚填写的计划，不临时扩大风险。</p>
+      html += `<p>所有硬性条件已通过。请只执行你刚刚填写的计划，不临时扩大风险。慢就是快，安全感来自重复执行正确流程。</p>
                <div class="code">${code}</div>
                <p class="muted">这是本次纪律许可码，不代表行情判断正确，也不保证盈利。</p>`;
     }else{
       html += `<ul>${reasons.map(r=>`<li>${r}</li>`).join('')}</ul>`;
-      html += `<p><b>先修改违规项或完成冷静期，再重新评估。不要绕过检查直接下单。</b></p>`;
+      html += `<p><b>先修改违规项或完成冷静期，再重新评估。不要绕过检查直接下单。</b></p><p class="muted">现在被拦住，不是错过机会，而是在恢复秩序。失去秩序，才是最大的风险。</p>`;
     }
     result.innerHTML = html;
     result.scrollIntoView({behavior:'smooth',block:'center'});
@@ -507,7 +541,7 @@
     if($('statRisk')) $('statRisk').textContent = avgRisk.toFixed(2)+'%';
     if($('statViolations')) $('statViolations').textContent = violations;
     if($('statsInsight')){
-      let insight = '完成几笔交易并回填结果后，这里会自动生成结论。';
+      let insight = '完成几笔交易并回填结果后，这里会自动生成结论。复盘不是为了责怪自己，而是为了建立安全感和秩序。';
       if(done.length >= 3){
         const emoRate = emotional ? emotionalLoss/emotional : 0;
         if(emotional >= 2 && emoRate >= 0.5) insight = `你的主要问题不是不会看行情，而是情绪交易的亏损率达到 ${(emoRate*100).toFixed(0)}%。下一阶段目标不是提高出手次数，而是把情绪交易压到接近零。`;
@@ -567,8 +601,8 @@
   $('exportBtn').addEventListener('click', () => {
     const logs = JSON.parse(localStorage.getItem('tradeGuardLogs') || '[]');
     if(!logs.length){ alert('暂无日志可导出'); return; }
-    const headers=['时间','状态','交易品种','类别','方向','杠杆','账户权益','保证金','入场价','止损价','目标价','计划持仓','风险百分比','心理评分','拦截原因','开仓逻辑','失效条件','是否完成','交易结果','实际盈亏USDT','纪律分类','复盘'];
-    const rows=logs.map(x=>[x.time,x.status,x.symbol,x.category,x.side,x.leverage,x.equity,x.margin,x.entry,x.stop,x.target,x.holdTime,x.riskPct,x.psychScore,x.reasons,x.reason,x.invalid,x.completed?'是':'否',x.outcome,x.pnl,x.discipline,x.review]);
+    const headers=['时间','状态','交易品种','类别','方向','杠杆','账户权益','保证金','入场价','止损价','目标价','计划持仓','风险百分比','盈亏比','心理评分','拦截原因','开仓逻辑','失效条件','是否完成','交易结果','实际盈亏USDT','纪律分类','复盘'];
+    const rows=logs.map(x=>[x.time,x.status,x.symbol,x.category,x.side,x.leverage,x.equity,x.margin,x.entry,x.stop,x.target,x.holdTime,x.riskPct,x.rr,x.psychScore,x.reasons,x.reason,x.invalid,x.completed?'是':'否',x.outcome,x.pnl,x.discipline,x.review]);
     const csv='\ufeff'+[headers,...rows].map(row=>row.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
     const url=URL.createObjectURL(blob), a=document.createElement('a');
